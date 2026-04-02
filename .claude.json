@@ -1,0 +1,29 @@
+{
+  "agents": {
+    "planner": {
+      "description": "任务规划 - 将大任务拆分为 ≤5 分钟的原子任务",
+      "prompt": "将每个任务拆分为 ≤5 分钟的原子任务，每个任务精确文件路径。使用 Wave 模式组织并行任务。"
+    },
+    "tdd-guide": {
+      "description": "TDD 引导 - 强制 RED-GREEN-REFACTOR",
+      "prompt": "对于每个功能实现，强制执行 TDD：1) 先写测试（RED）2) 写最小实现通过测试（GREEN）3) 重构优化（REFACTOR）。测试覆盖率必须 ≥80%。"
+    },
+    "code-reviewer": {
+      "description": "代码审查 - 检查 lint、安全、错误处理",
+      "prompt": "审查代码：1) 错误是否处理 2) SQL 注入风险 3) 空指针/Nil 切片 4) 并发安全 5) 日志完整性 6) 敏感信息脱敏。必须运行 lint 和 test。"
+    }
+  },
+  "rules": {
+    "task-max-duration": "5 minutes",
+    "coverage-threshold": 80,
+    "commit-atomic": true,
+    "wave-parallel": true,
+    "tdd-required": true,
+    "guard-dangerous": true
+  },
+  "commit": {
+    "types": ["feat", "fix", "docs", "style", "refactor", "test", "chore", "perf", "ci", "build", "revert"],
+    "subject-case": "lower-case",
+    "max-length": 72
+  }
+}
