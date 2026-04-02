@@ -52,19 +52,37 @@ func (h *CompanyHandler) Get(c *gin.Context) {
 
 func (h *CompanyHandler) Update(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	var comp company.Company
-	if err := c.ShouldBindJSON(&comp); err != nil {
+
+	var req map[string]interface{}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	comp.ID = id
 
-	if err := h.service.Update(&comp); err != nil {
+	updates := map[string]interface{}{}
+	if name, ok := req["name"].(string); ok {
+		updates["name"] = name
+	}
+	if code, ok := req["code"].(string); ok {
+		updates["code"] = code
+	}
+	if shortName, ok := req["short_name"].(string); ok {
+		updates["short_name"] = shortName
+	}
+	if status, ok := req["status"].(float64); ok {
+		updates["status"] = int16(status)
+	}
+
+	if len(updates) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "没有需要更新的字段"})
+		return
+	}
+
+	if err := h.service.UpdateFields(id, updates); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// 获取更新后的数据
 	updated, _ := h.service.GetByID(id)
 	c.JSON(http.StatusOK, updated)
 }

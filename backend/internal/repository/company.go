@@ -43,18 +43,12 @@ func (r *CompanyRepository) List() ([]company.Company, error) {
 }
 
 func (r *CompanyRepository) Update(comp *company.Company) error {
-	// 只更新非零值字段，避免覆盖未提供的字段
-	updates := map[string]interface{}{}
-	if comp.Name != "" {
-		updates["name"] = comp.Name
-	}
-	if comp.Code != "" {
-		updates["code"] = comp.Code
-	}
-	if comp.Status != 0 {
-		updates["status"] = comp.Status
-	}
-	return r.db.Model(&company.Company{}).Where("id = ?", comp.ID).Updates(updates).Error
+	return r.db.Save(comp).Error
+}
+
+// UpdateFields 更新指定字段（支持显式 null 值）
+func (r *CompanyRepository) UpdateFields(id int64, fields map[string]interface{}) error {
+	return r.db.Model(&company.Company{}).Where("id = ?", id).Updates(fields).Error
 }
 
 func (r *CompanyRepository) Delete(id int64) error {

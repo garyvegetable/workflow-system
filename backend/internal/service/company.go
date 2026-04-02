@@ -29,6 +29,10 @@ func (s *CompanyService) Update(comp *company.Company) error {
 	return s.repo.Update(comp)
 }
 
+func (s *CompanyService) UpdateFields(id int64, fields map[string]interface{}) error {
+	return s.repo.UpdateFields(id, fields)
+}
+
 func (s *CompanyService) Delete(id int64) error {
 	return s.repo.Delete(id)
 }
