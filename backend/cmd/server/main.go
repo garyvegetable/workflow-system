@@ -193,6 +193,7 @@ func main() {
 			auth.PUT("/workflows/:id", wfHandler.Update)
 			auth.POST("/workflows/:id/publish", wfHandler.Publish)
 			auth.POST("/workflows/:id/disable", wfHandler.Disable)
+			auth.POST("/workflows/:id/enable", wfHandler.Enable)
 			auth.POST("/workflows/:id/copy", wfHandler.Copy)
 			auth.DELETE("/workflows/:id", wfHandler.Delete)
 			auth.POST("/workflows/instances", wfHandler.CreateInstance)

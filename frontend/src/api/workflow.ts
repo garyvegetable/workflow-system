@@ -8,6 +8,7 @@ export const workflowApi = {
   delete: (id: number) => apiClient.delete(`/workflows/${id}`),
   publish: (id: number) => apiClient.post(`/workflows/${id}/publish`),
   disable: (id: number) => apiClient.post(`/workflows/${id}/disable`),
+  enable: (id: number) => apiClient.post(`/workflows/${id}/enable`),
   copy: (id: number, targetCompanyId: number) =>
     apiClient.post(`/workflows/${id}/copy`, { target_company_id: targetCompanyId }),
   // 申请提交

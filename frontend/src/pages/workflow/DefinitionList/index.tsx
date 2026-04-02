@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Space, Tag, message, Modal, Select } from 'antd';
-import { PlusOutlined, EditOutlined, UploadOutlined, StopOutlined, CopyOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Tag, message, Modal, Select, Popconfirm } from 'antd';
+import { PlusOutlined, EditOutlined, UploadOutlined, StopOutlined, CopyOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { workflowApi } from '@/api/workflow';
 import { companyApi } from '@/api/company';
@@ -77,10 +77,30 @@ export const WorkflowList = () => {
   const handleDisable = async (id: number) => {
     try {
       await workflowApi.disable(id);
-      message.success('禁用成功');
+      message.success('已禁用');
       fetchWorkflows();
     } catch (error) {
       message.error('禁用失败');
+    }
+  };
+
+  const handleEnable = async (id: number) => {
+    try {
+      await workflowApi.enable(id);
+      message.success('已启用');
+      fetchWorkflows();
+    } catch (error) {
+      message.error('启用失败');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await workflowApi.delete(id);
+      message.success('删除成功');
+      fetchWorkflows();
+    } catch (error) {
+      message.error('删除失败');
     }
   };
 
@@ -135,9 +155,26 @@ export const WorkflowList = () => {
               禁用
             </Button>
           )}
+          {record.status === 3 && (
+            <Button type="link" icon={<CheckCircleOutlined />} onClick={() => handleEnable(record.id)}>
+              启用
+            </Button>
+          )}
           <Button type="link" icon={<CopyOutlined />} onClick={() => openCopyModal(record)}>
             复制
           </Button>
+          <Popconfirm
+            title="确认删除"
+            description="删除后不可恢复，确定要删除吗？"
+            onConfirm={() => handleDelete(record.id)}
+            okText="删除"
+            cancelText="取消"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              删除
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },

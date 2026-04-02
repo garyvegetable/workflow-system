@@ -68,6 +68,10 @@ func (r *WorkflowRepository) Disable(id int64) error {
 	return r.db.Model(&workflow.WorkflowDefinition{}).Where("id = ?", id).Update("status", 3).Error
 }
 
+func (r *WorkflowRepository) Enable(id int64) error {
+	return r.db.Model(&workflow.WorkflowDefinition{}).Where("id = ?", id).Update("status", 2).Error
+}
+
 func (r *WorkflowRepository) CopyToCompany(id int64, targetCompanyID int64) (*workflow.WorkflowDefinition, error) {
 	var source workflow.WorkflowDefinition
 	if err := r.db.First(&source, id).Error; err != nil {

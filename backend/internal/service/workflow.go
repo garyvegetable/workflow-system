@@ -49,6 +49,10 @@ func (s *WorkflowService) Disable(id int64) error {
 	return s.repo.Disable(id)
 }
 
+func (s *WorkflowService) Enable(id int64) error {
+	return s.repo.Enable(id)
+}
+
 func (s *WorkflowService) CreateInstance(inst *instance.WorkflowInstance, formData map[string]interface{}) error {
 	inst.FormData, _ = json.Marshal(formData)
 	inst.Status = 1 // 审批中

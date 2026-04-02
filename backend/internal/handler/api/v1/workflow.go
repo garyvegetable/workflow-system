@@ -108,6 +108,15 @@ func (h *WorkflowHandler) Disable(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "disabled"})
 }
 
+func (h *WorkflowHandler) Enable(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err := h.service.Enable(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "enabled"})
+}
+
 func (h *WorkflowHandler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err := h.service.Delete(id); err != nil {
