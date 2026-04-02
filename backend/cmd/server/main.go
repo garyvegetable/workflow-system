@@ -166,6 +166,8 @@ func main() {
 			auth.POST("/employees/:id/bank-accounts", empHandler.CreateBankAccount)
 			auth.PUT("/employees/:id/bank-accounts/:aid", empHandler.UpdateBankAccount)
 			auth.DELETE("/employees/:id/bank-accounts/:aid", empHandler.DeleteBankAccount)
+			auth.GET("/employees/:id/departments", empHandler.GetDepartments)
+			auth.PUT("/employees/:id/departments", empHandler.SetDepartments)
 
 			// 供应商
 			supHandler := v1.NewSupplierHandler(supService)

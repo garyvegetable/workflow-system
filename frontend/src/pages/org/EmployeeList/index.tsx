@@ -23,6 +23,10 @@ import {
   CheckCircleFilled,
 } from '@ant-design/icons';
 import { employeeApi, Employee, BankAccount } from '@/api/employee';
+import { companyApi } from '@/api/company';
+import { departmentApi } from '@/api/department';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 const levelOptions = [
   { label: '员工', value: '员工' },
@@ -37,6 +41,7 @@ const statusOptions = [
 ];
 
 export const EmployeeList = () => {
+  const companyId = useSelector((state: RootState) => state.auth.user?.companyId);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -51,6 +56,8 @@ export const EmployeeList = () => {
   const [bankModalVisible, setBankModalVisible] = useState(false);
   const [editingBankAccount, setEditingBankAccount] = useState<BankAccount | null>(null);
   const [bankForm] = Form.useForm();
+  const [companyOptions, setCompanyOptions] = useState<{label: string; value: number}[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<{label: string; value: number}[]>([]);
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -71,17 +78,39 @@ export const EmployeeList = () => {
   const handleAdd = () => {
     setEditingEmployee(null);
     form.resetFields();
+    // Fetch companies for dropdown
+    companyApi.list().then(res => {
+      setCompanyOptions(res.data.map((c: any) => ({ label: c.name, value: c.id })));
+    }).catch(() => {});
+    if (companyId) {
+      form.setFieldsValue({ company_id: companyId });
+      // Fetch departments for selected company
+      departmentApi.list(companyId).then(res => {
+        setDepartmentOptions(res.data.map((d: any) => ({ label: d.name, value: d.id })));
+      }).catch(() => {});
+    }
     setModalVisible(true);
   };
 
   const handleEdit = (record: Employee) => {
     setEditingEmployee(record);
+    // Fetch companies for dropdown
+    companyApi.list().then(res => {
+      setCompanyOptions(res.data.map((c: any) => ({ label: c.name, value: c.id })));
+    }).catch(() => {});
+    // Fetch departments for employee's company
+    if (record.company_id) {
+      departmentApi.list(record.company_id).then(res => {
+        setDepartmentOptions(res.data.map((d: any) => ({ label: d.name, value: d.id })));
+      }).catch(() => {});
+    }
     form.setFieldsValue({
       username: record.username,
       email: record.email,
       level: record.level,
       status: record.status,
       company_id: record.company_id,
+      department_ids: record.department_ids,
     });
     setModalVisible(true);
   };
@@ -101,9 +130,17 @@ export const EmployeeList = () => {
       const values = await form.validateFields();
       if (editingEmployee) {
         await employeeApi.update(editingEmployee.id, values);
+        // Update departments if provided
+        if (values.department_ids) {
+          await employeeApi.setDepartments(editingEmployee.id, values.department_ids);
+        }
         message.success('更新成功');
       } else {
-        await employeeApi.create(values);
+        const result = await employeeApi.create(values);
+        // Set departments for new employee
+        if (values.department_ids && values.department_ids.length > 0) {
+          await employeeApi.setDepartments(result.data.id, values.department_ids);
+        }
         message.success('创建成功');
       }
       setModalVisible(false);
@@ -286,9 +323,30 @@ export const EmployeeList = () => {
           <Form.Item
             name="company_id"
             label="所属公司"
-            rules={[{ required: true, message: '请输入公司ID' }]}
+            rules={[{ required: true, message: '请选择公司' }]}
           >
-            <Input type="number" />
+            <Select
+              placeholder="选择公司"
+              options={companyOptions}
+              onChange={(value) => {
+                form.setFieldsValue({ department_ids: undefined });
+                // Fetch departments when company changes
+                departmentApi.list(value).then(res => {
+                  setDepartmentOptions(res.data.map((d: any) => ({ label: d.name, value: d.id })));
+                }).catch(() => {});
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="department_ids"
+            label="所属部门"
+          >
+            <Select
+              mode="multiple"
+              placeholder="选择部门（可多选）"
+              options={departmentOptions}
+              allowClear
+            />
           </Form.Item>
           <Form.Item name="status" label="状态" initialValue={1}>
             <Select options={statusOptions} />

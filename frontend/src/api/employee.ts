@@ -9,6 +9,7 @@ export interface Employee {
   level: string
   status: number
   password?: string
+  department_ids?: number[]
 }
 
 export interface BankAccount {
@@ -52,4 +53,10 @@ export const employeeApi = {
 
   deleteBankAccount: (id: number, aid: number) =>
     apiClient.delete(`/employees/${id}/bank-accounts/${aid}`),
+
+  getDepartments: (id: number) =>
+    apiClient.get<number[]>(`/employees/${id}/departments`),
+
+  setDepartments: (id: number, departmentIds: number[]) =>
+    apiClient.put(`/employees/${id}/departments`, { department_ids: departmentIds }),
 };

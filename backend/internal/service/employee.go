@@ -81,3 +81,11 @@ func (s *EmployeeService) DeleteBankAccount(id int64) error {
 func (s *EmployeeService) SearchByName(name string, companyID int64) ([]employee.Employee, error) {
 	return s.repo.SearchByName(name, companyID)
 }
+
+func (s *EmployeeService) SetDepartments(empID int64, deptIDs []int64) error {
+	return s.repo.SetDepartments(empID, deptIDs)
+}
+
+func (s *EmployeeService) GetDepartments(empID int64) ([]int64, error) {
+	return s.repo.GetDepartments(empID)
+}
